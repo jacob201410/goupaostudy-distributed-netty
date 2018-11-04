@@ -54,7 +54,7 @@ public class Test {
     }
 
     private static void letMeSleep(Random random) {
-        final int sleepGap = 1000;
+        final int sleepGap = 1500;
         try {
             Thread.sleep((random.nextInt(sleepGap)));
         } catch (InterruptedException e) {
