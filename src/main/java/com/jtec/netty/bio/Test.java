@@ -19,6 +19,7 @@ public class Test {
 
         Thread.sleep(100L);
 
+        // method 1 - 调用算术运算业务逻辑
         char[] op = {'+','-','*','/'};
 
         final Random random = new Random(System.currentTimeMillis());
@@ -32,14 +33,32 @@ public class Test {
                             + op[random.nextInt(opLength)]
                             + (random.nextInt(10) + 1);
                     Client.send(expression);
-                    try {
-                        Thread.sleep((random.nextInt(1000)));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    letMeSleep(random);
+                }
+            }
+        });//.start();
+
+        // method 2 - let's talk for google+ talk
+        String[] nameArr = {"Amye","Bob","Clark","Elan","Dick"};
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final int familySize = nameArr.length;
+                while (true) {
+                    String talker = nameArr[random.nextInt(familySize)];
+                    Client.send(talker);
+                    letMeSleep(random);
                 }
             }
         }).start();
+    }
 
+    private static void letMeSleep(Random random) {
+        final int sleepGap = 1000;
+        try {
+            Thread.sleep((random.nextInt(sleepGap)));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

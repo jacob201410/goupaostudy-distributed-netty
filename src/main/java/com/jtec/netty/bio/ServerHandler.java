@@ -27,40 +27,23 @@ public class ServerHandler implements Runnable {
             outputStream = new PrintWriter(socket.getOutputStream(), true);
             String expression;
             int result;
+            String talkRoomMsg;
             while (true) {
                 if ((expression = inputStream.readLine()) == null) {
                     break;
                 }
                 System.out.println("Server received info:" + expression);
-                result = Calculator.cal(expression);
-                outputStream.println(result);
+//                result = Calculator.cal(expression);
+//                outputStream.println(result);
+                talkRoomMsg = SayHi.justHi(expression);
+                outputStream.println(talkRoomMsg);
             }
 
         } catch(Exception e) {
             e.printStackTrace();
             System.out.println("Server run has an exception:" + e.getMessage());
         } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch(IOException e) {
-                    System.out.println("inputStream close has an exception:" + e.getMessage());
-                }
-                // for GC
-                inputStream = null;
-            }
-            if (outputStream != null) {
-                outputStream.close();
-                outputStream = null;
-            }
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    System.out.println("socket close has an exception:" + e.getMessage());
-                }
-                socket = null;
-            }
+            Client.letMeCloseIOStream(inputStream, outputStream, socket);
         }
 
 
