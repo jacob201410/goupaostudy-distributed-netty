@@ -7,7 +7,6 @@ public class Test {
 
     public static void main(String[] args) throws InterruptedException {
         new Thread(new Runnable () {
-
             @Override
             public void run() {
                 try {
@@ -30,7 +29,8 @@ public class Test {
                 final int opLength = op.length;
                 while(true) {
                     String expression = random.nextInt(10) + ""
-                            + op[random.nextInt(opLength)] + (random.nextInt(10) + 1);
+                            + op[random.nextInt(opLength)]
+                            + (random.nextInt(10) + 1);
                     Client.send(expression);
                     try {
                         Thread.sleep((random.nextInt(1000)));

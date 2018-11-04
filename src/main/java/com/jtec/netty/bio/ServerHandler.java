@@ -24,27 +24,27 @@ public class ServerHandler implements Runnable {
         PrintWriter outputStream = null;
         try {
             inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            outputStream = new PrintWriter(socket.getOutputStream());
+            outputStream = new PrintWriter(socket.getOutputStream(), true);
             String expression;
-            String result;
+            int result;
             while (true) {
                 if ((expression = inputStream.readLine()) == null) {
                     break;
                 }
-                log.info("Server received info:", expression);
+                System.out.println("Server received info:" + expression);
                 result = Calculator.cal(expression);
                 outputStream.println(result);
             }
 
         } catch(Exception e) {
             e.printStackTrace();
-            log.info("Server run has an exception:", e);
+            System.out.println("Server run has an exception:" + e.getMessage());
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch(IOException e) {
-                    log.info("inputStream close has an exception:", e);
+                    System.out.println("inputStream close has an exception:" + e.getMessage());
                 }
                 // for GC
                 inputStream = null;
@@ -57,7 +57,7 @@ public class ServerHandler implements Runnable {
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    log.info("socket close has an exception:", e);
+                    System.out.println("socket close has an exception:" + e.getMessage());
                 }
                 socket = null;
             }
