@@ -40,89 +40,67 @@ public class TCPEchoClient implements Runnable {
     @Override
     public void run() {
 
-        Charset charset = Charset.forName("UTF-8");
-
-        Selector selector;
-
+        Charset cs = Charset.forName("UTF-8");
+        Selector selector = null;
         try {
-            SocketChannel socketChannel = SocketChannel.open();
-
-            socketChannel.configureBlocking(false);
-
+            SocketChannel sc = SocketChannel.open();
+            sc.configureBlocking(false);
             selector = Selector.open();
-            // 按位或：001 | 100 = 101 = 5
             int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
-            System.out.println("client interestSet:" + interestSet);
-            socketChannel.register(selector, interestSet, new Buffers(256, 256));
-
-            socketChannel.connect(remoteAddress);
-
-            while(!socketChannel.finishConnect()) {
+            sc.register(selector, interestSet, new Buffers(256, 256));
+            sc.connect(remoteAddress);
+            while(!sc.finishConnect()) {
 
             }
-
-            System.out.println(name + " finished connection.");
-
         } catch (IOException e) {
-            System.out.println("client connect failed and has an exception:" + e.getMessage());
+            System.out.println("client connect failed");
             return;
         }
 
-        int i = 1;
-        while(!Thread.currentThread().isInterrupted()) {
-            try {
+        try {
+            int i = 1;
+            while(!Thread.currentThread().isInterrupted()) {
                 selector.select();
-            } catch (IOException e) {
-                System.out.println("selector.select has an exception: " + e.getMessage());
+                Set<SelectionKey> keySet = selector.selectedKeys();
+                Iterator<SelectionKey> ki = keySet.iterator();
+                while(ki.hasNext()) {
+                    SelectionKey key = ki.next();
+                    ki.remove();
+                    Buffers buffers = (Buffers) key.attachment();
+                    ByteBuffer readBuffer = buffers.getReadBuffer();
+                    ByteBuffer writeBuffer = buffers.getWriteBuffer();
+                    SocketChannel sc = (SocketChannel) key.channel();
+                    if(key.isReadable()) {
+                        sc.read(readBuffer);
+                        readBuffer.flip();
+                        CharBuffer cb = cs.decode(readBuffer);
+                        System.out.println(cb.array());
+                        readBuffer.clear();
+                    }
+                    if(key.isWritable()) {
+                        writeBuffer.put((name + " - " + i).getBytes("UTF-8"));
+                        writeBuffer.flip();
+                        sc.write(writeBuffer);
+                        writeBuffer.clear();
+                        i++;
+                    }
+                }
+                Thread.sleep(1000 + random.nextInt(1000));
             }
-
-            Set<SelectionKey> keySet = selector.selectedKeys();
-            Iterator<SelectionKey> iterator = keySet.iterator();
-
-            while(iterator.hasNext()) {
-                SelectionKey key = iterator.next();
-                // another channel for next time
-                iterator.remove();
-
-                Buffers buffers = (Buffers)key.attachment();
-                ByteBuffer readBuf = buffers.getReadBuffer();
-                ByteBuffer writeBuf = buffers.getWriteBuffer();
-
-                SocketChannel socketChannel = (SocketChannel) key.channel();
-
-                // event : read
-                if(key.isReadable()) {
-                    try {
-                        socketChannel.read(readBuf);
-                    } catch (IOException e) {
-                        System.out.println("socketChannel.read has an exception: " + e.getMessage());
-                    }
-                    readBuf.flip();
-                    CharBuffer charBuf = charset.decode(readBuf);
-                    System.out.println(charBuf.array());
-                    readBuf.clear();
-                }
-
-                // event : write
-                if (key.isWritable()) {
-                    try {
-                        writeBuf.put((name + i).getBytes(charset.name()));
-                    } catch (UnsupportedEncodingException e) {
-                        System.out.println("writeBuf.put has an exception: " + e.getMessage());
-                    }
-                    writeBuf.flip();
-
-                    try {
-                        socketChannel.write(writeBuf);
-                    } catch (IOException e) {
-                        System.out.println("socketChannel.write has an exception: " + e.getMessage());
-                    }
-
-                    writeBuf.clear();
-                    i++;
-                }
+        } catch(InterruptedException e){
+            System.out.println(name + " is interrupted");
+        } catch(IOException e) {
+            System.out.println(name + " encounter a connect error");
+        } finally {
+            try {
+                selector.close();
+            } catch (IOException e1) {
+                System.out.println(name + " close selector failed");
+            } finally {
+                System.out.println(name + "  closed");
             }
         }
+
     }
 
 }

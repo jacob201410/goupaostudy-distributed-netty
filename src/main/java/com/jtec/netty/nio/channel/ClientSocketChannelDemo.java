@@ -38,12 +38,9 @@ public class ClientSocketChannelDemo {
 
         thdA.start();
         thdB.start();
-        Thread.sleep(5000L);
-
-        thdA.interrupt();
         thdC.start();
         Thread.sleep(5000L);
-        thdC.interrupt();
+        thdA.interrupt();
         thdD.start();
     }
 }
