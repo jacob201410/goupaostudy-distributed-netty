@@ -120,7 +120,9 @@ public class ServiceSocketChannelDemo {
 
                         // 服务端完成读操作
                         readBuf.clear();
-                        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                        int interestOps = key.interestOps() | SelectionKey.OP_WRITE;
+                        System.out.println("service interestOps" + interestOps);
+                        key.interestOps(interestOps);
                     }
 
                     // 事件驱动：对可写事件

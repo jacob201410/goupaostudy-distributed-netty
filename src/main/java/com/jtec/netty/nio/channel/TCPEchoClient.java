@@ -50,9 +50,9 @@ public class TCPEchoClient implements Runnable {
             socketChannel.configureBlocking(false);
 
             selector = Selector.open();
-
+            // 按位或：001 | 100 = 101 = 5
             int interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
-
+            System.out.println("client interestSet:" + interestSet);
             socketChannel.register(selector, interestSet, new Buffers(256, 256));
 
             socketChannel.connect(remoteAddress);
@@ -125,24 +125,4 @@ public class TCPEchoClient implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        String REMOTE_HOST = "127.0.0.1";
-        final int REMOTE_PORT = 8080;
-        InetSocketAddress remoteAddress = new InetSocketAddress(REMOTE_HOST, REMOTE_PORT);
-
-        Thread thdA = new Thread(new TCPEchoClient("Thread-A", remoteAddress));
-        Thread thdB = new Thread(new TCPEchoClient("Thread-B", remoteAddress));
-        Thread thdC = new Thread(new TCPEchoClient("Thread-C", remoteAddress));
-        Thread thdD = new Thread(new TCPEchoClient("Thread-D", remoteAddress));
-
-        thdA.start();
-        thdB.start();
-        Thread.sleep(5000L);
-
-        thdA.interrupt();
-        thdC.start();
-        Thread.sleep(5000L);
-        thdC.interrupt();
-        thdD.start();
-    }
 }
