@@ -17,7 +17,7 @@ public class MyBizServerHandler extends ChannelInboundHandlerAdapter {
 
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("my biz handler channel active...");
     }
 
@@ -30,7 +30,6 @@ public class MyBizServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        ctx.channel().close();
         System.out.println("get exception:" + cause.getMessage());
     }
 }

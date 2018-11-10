@@ -33,7 +33,7 @@ public class NettyServer {
     private static final EventLoopGroup workGroup = new NioEventLoopGroup(BIZ_THREAD_SIZE);
 
     private static final int INIT_OFFSET = 0;
-    private static final int CORE_POWER_NUMBER = 2 * 2;
+    private static final int INT_VALUE_FOUR = 4;
 
     public static void start() throws Exception {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -44,7 +44,8 @@ public class NettyServer {
             @Override
             protected void initChannel(Channel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
-                pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, INIT_OFFSET,CORE_POWER_NUMBER,INIT_OFFSET,CORE_POWER_NUMBER));
+                pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,
+                        INIT_OFFSET,INT_VALUE_FOUR,INIT_OFFSET,INT_VALUE_FOUR));
                 pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
                 pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
                 // 最后加载入自己的业务handler

@@ -17,8 +17,6 @@ public class MyBizClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("client receive message :" + msg);
-        ctx.channel().writeAndFlush("accept message " + msg);
-        ctx.close();
     }
 
     @Override
