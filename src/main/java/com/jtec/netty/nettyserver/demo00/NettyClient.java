@@ -6,6 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
@@ -25,7 +26,7 @@ public class NettyClient implements Runnable {
     private static final int REMOTE_PORT = 6666;
 
     private static final int INIT_OFFSET = 0;
-    private static final int INT_VALUE_FOUR = 2 * 2;
+    private static final int INT_VALUE_FOUR = 4;
 
     @Override
     public void run() {
@@ -43,6 +44,7 @@ public class NettyClient implements Runnable {
                             ChannelPipeline pipeline = channel.pipeline();
                             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(
                                     Integer.MAX_VALUE, INIT_OFFSET,INT_VALUE_FOUR,INIT_OFFSET,INT_VALUE_FOUR));
+                            pipeline.addLast("frameEncoder", new LengthFieldPrepender(INT_VALUE_FOUR));
                             pipeline.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
                             pipeline.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
                             // 最后加载入自己的业务handler
@@ -51,7 +53,7 @@ public class NettyClient implements Runnable {
                     });
             for (int i = 0; i < 10; i++) {
                 ChannelFuture future = bootstrap.connect(REMOTE_IP, REMOTE_PORT).sync();
-                future.channel().writeAndFlush("Hi, NettyServer, this is " + Thread.currentThread().getName() + " - " + i);
+                future.channel().writeAndFlush(" Hi, NettyServer, this is " + Thread.currentThread().getName() + " - " + i);
                 future.channel().closeFuture().sync();
             }
 
